@@ -1,0 +1,12 @@
+{
+    "name": "jonas/composer-proxy",
+    "require": {
+        "composer/composer": "^1.10"
+    },
+    "authors": [
+        {
+            "name": "Jonas Renaudot",
+            "email": "jonas.renaudot@swissquote.ch"
+        }
+    ]
+}
