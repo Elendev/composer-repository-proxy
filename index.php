@@ -1,13 +1,25 @@
 <?php
 
+use Composer\Factory;
 use Composer\Repository\ComposerRepository;
 use Composer\IO\NullIO;
 use Composer\Config;
 
 require_once "./vendor/autoload.php";
 
-$repo = new ComposerRepository(['url' => 'https://packagist.org'], new NullIO(), new Config(true, '.composer'));
+$repo = 'https://packages.drupal.org/8'; // 'https://packagist.org';
 
-$packages = $repo->getPackages();
+$repo = new ComposerRepository(['url' => $repo], new NullIO(), Factory::createConfig());
 
-print_r($packages);
+$providerNames = $repo->getProviderNames();
+
+foreach ($providerNames as $providerName) {
+    echo $providerName . "\n";
+    $package = $repo->findPackage($providerName, '*');
+
+}
+
+$packageBuilder = new \Composer\Satis\Builder\PackagesBuilder();
+
+
+echo 'There are ' . count($providerNames) . ' providers';
