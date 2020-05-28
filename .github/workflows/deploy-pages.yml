@@ -1,0 +1,27 @@
+name: Deploy generated pages
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+
+jobs:
+  PHPCS:
+    name: Code Sniffing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: 'Composer install'
+        uses: docker://composer:1.10
+        with:
+          args: install
+      - name: 'Generate pages'
+        uses: docker://php:7.4-cli
+        with:
+          args: "php index.php"
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: repository
+
