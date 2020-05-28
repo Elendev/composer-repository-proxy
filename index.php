@@ -34,14 +34,19 @@ $packages = [];
 $counter = 1;
 
 foreach ($providerNames as $providerName) {
-    $output->write($counter . "/" . count($providerNames) . " - " . $providerName . "\n");
-    $currentPackages = $repo->whatProvides($pool, $providerName);
+    try {
+        $output->write($counter . "/" . count($providerNames) . " - " . $providerName . "\n");
+        $currentPackages = $repo->whatProvides($pool, $providerName);
 
-    if (!empty($currentPackages)) {
-        $packages = array_merge($packages, $currentPackages);
-    } else {
-        $output->write("Package $providerName not found\n");
+        if (!empty($currentPackages)) {
+            $packages = array_merge($packages, $currentPackages);
+        } else {
+            $output->write("Package $providerName not found\n");
+        }
+    } catch (\Exception $e) {
+        $output->writeln('An error occured for provider ' . $providerName . ':' . $e->getMessage());
     }
+
 
     $counter ++;
 }
