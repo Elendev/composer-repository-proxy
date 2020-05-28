@@ -7,8 +7,8 @@ on:
     - cron: '*/15 * * * *'
 
 jobs:
-  PHPCS:
-    name: Code Sniffing
+  RepoGeneration:
+    name: Repository Generation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
