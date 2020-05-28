@@ -1,5 +1,8 @@
 name: Deploy generated pages
 on:
+  push:
+    branches:
+      - master
   schedule:
     - cron: '*/15 * * * *'
 
