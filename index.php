@@ -31,9 +31,10 @@ $packageBuilder = new PackagesBuilder($output, $outputDirectory, [
 ], false);
 
 $packages = [];
+$counter = 1;
 
 foreach ($providerNames as $providerName) {
-    $output->write($providerName . "\n");
+    $output->write($counter . "/" . count($providerNames) . " - " . $providerName . "\n");
     $currentPackages = $repo->whatProvides($pool, $providerName);
 
     if (!empty($currentPackages)) {
@@ -41,6 +42,8 @@ foreach ($providerNames as $providerName) {
     } else {
         $output->write("Package $providerName not found\n");
     }
+
+    $counter ++;
 }
 
 $packageBuilder->dump($packages);
