@@ -20,7 +20,7 @@ jobs:
       - name: 'Generate pages'
         uses: docker://php:7.4-cli
         with:
-          args: "php index.php"
+          args: "php -d memory_limit=7000M index.php"
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
