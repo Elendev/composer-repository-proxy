@@ -48,12 +48,13 @@ export default class Generator {
             };
             pkg.packages[packageName] = this.packages[packageName];
             const fileName = packageDestination + packageName + '.json';
+            const content = JSON.stringify(pkg) + '\n';
 
             promises.push(
                 fs.promises.mkdir(path.dirname(fileName), {
                     recursive: true
                 }).then(() => {
-                    promises.push(fs.promises.writeFile(fileName, JSON.stringify(pkg)).then(
+                    promises.push(fs.promises.writeFile(fileName, content).then(
                         () => {
                             console.log('File ' + fileName + ' dumped')
                         })
