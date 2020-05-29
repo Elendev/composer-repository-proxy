@@ -9,20 +9,20 @@ jobs:
     name: Repository Generation
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: 'Composer install'
-        uses: docker://composer:1.10
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
         with:
-          args: install
-      - name: 'Generate pages'
-        uses: docker://php:7.4-cli
-        with:
-          args: "php -d memory_limit=7000M index.php"
+          node-version: 14.x
+
+      - run: yarn install
+
+      - run: node dist/index.js
+
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: repository
-
+          FOLDER: output

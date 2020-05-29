@@ -1,3 +1,6 @@
 vendor
 .idea
 repository
+node_module
+dist
+output

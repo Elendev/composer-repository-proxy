@@ -1,0 +1,20 @@
+{
+  "name": "composer-repository-proxy",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "repository": "https://github.com/Elendev/composer-repository-proxy.git",
+  "author": "Jonas Renaudot <jonas.renaudot@swissquote.ch>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "dependencies": {
+    "@types/node-fetch": "^2.5.7",
+    "https-proxy-agent": "^5.0.0",
+    "limiter": "^1.1.5",
+    "node-fetch": "^2.6.0",
+    "pretty-bytes": "^5.3.0",
+    "typescript": "^3.9.3"
+  }
+}
