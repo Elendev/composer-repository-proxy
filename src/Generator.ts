@@ -10,9 +10,9 @@ import crypto from 'crypto';
 export default class Generator {
 
     private providerNames = [
-        'p/%package%$%hash%.json',
-        'p/%package%.json',
-        'p2/%package%.json',
+        '/p/%package%$%hash%.json',
+        '/p/%package%.json',
+        '/p2/%package%.json',
     ];
 
     private packageJson: packagesJson;
