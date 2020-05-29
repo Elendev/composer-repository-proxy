@@ -11,11 +11,13 @@ interface providerInfos {
 export default class Dumper {
 
     private mainProviderName = '/p/all$%hash%.json';
+    private providersUrl = '/p/%package%$%hash%.json';
+    private metadataUrl = '/p2/%package%.json';
 
     private providerNames = [
-        '/p/%package%$%hash%.json',
+        this.providersUrl,
+        this.metadataUrl,
         '/p/%package%.json',
-        '/p2/%package%.json',
     ];
 
     public async dump(packages: object, destination: string) {
@@ -35,7 +37,9 @@ export default class Dumper {
 
         providersInfos.push(...(await this.awaitAll<providerInfos>(promises)));
 
-        await this.dumpProvider(providersInfos, destination);
+        const providerIncludeInfos = await this.dumpProvider(providersInfos, destination);
+
+        await this.dumpPackagesJson([providerIncludeInfos], destination);
     }
 
     private async dumpPackage(packages: any, packageName: string, destination: string): Promise<providerInfos> {
@@ -62,7 +66,7 @@ export default class Dumper {
         };
     }
 
-    private async dumpProvider(infos: providerInfos[], destination: string) {
+    private async dumpProvider(infos: providerInfos[], destination: string): Promise<providerInfos> {
 
         const providerFileObject = {providers: {}};
 
@@ -76,6 +80,32 @@ export default class Dumper {
         const hash = await this.hash(content);
 
         await this.writeFile(destination + this.mainProviderName.replace('%hash%', hash.value), content);
+
+        return {
+            algo: hash.algo,
+            hash: hash.value,
+            pkg: this.mainProviderName
+        }
+    }
+
+    private async dumpPackagesJson(infos: providerInfos[], destination: string) {
+        const providerFileObject = {
+            packages: [],
+            "providers-url": this.providersUrl,
+            "metadata-url": this.metadataUrl,
+            "providers-includes": {}
+        };
+
+        for (let i = 0; i < infos.length; i ++) {
+            const currentInfo = infos[i];
+            providerFileObject["providers-includes"][currentInfo.pkg] = {}
+            providerFileObject["providers-includes"][currentInfo.pkg][currentInfo.algo] = currentInfo.hash
+        }
+
+        const content = JSON.stringify(providerFileObject) + '\n';
+        const hash = await this.hash(content);
+
+        await this.writeFile(destination + '/packages.json', content);
     }
 
     private async writeFile(filename: string, content: string) {
