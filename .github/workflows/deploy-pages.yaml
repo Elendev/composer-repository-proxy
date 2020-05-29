@@ -18,6 +18,8 @@ jobs:
 
       - run: yarn install
 
+      - run: yarn build
+
       - run: node dist/index.js
 
       - name: Deploy 🚀
