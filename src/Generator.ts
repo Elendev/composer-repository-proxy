@@ -4,9 +4,16 @@ import {packagesJson, providerJson} from "./composerApi";
 import prettyBytes from 'pretty-bytes';
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 
 
 export default class Generator {
+
+    private providerNames = [
+        'p/%package%$%hash%.json',
+        'p/%package%.json',
+        'p2/%package%.json',
+    ];
 
     private packageJson: packagesJson;
 
@@ -40,27 +47,9 @@ export default class Generator {
     public async dump(destination: string) {
 
         let promises = [];
-        const packageDestination = destination + '/p/';
 
         for(let packageName in this.packages) {
-            const pkg = {
-                packages: {}
-            };
-            pkg.packages[packageName] = this.packages[packageName];
-            const fileName = packageDestination + packageName + '.json';
-            const content = JSON.stringify(pkg) + '\n';
-
-            promises.push(
-                fs.promises.mkdir(path.dirname(fileName), {
-                    recursive: true
-                }).then(() => {
-                    promises.push(fs.promises.writeFile(fileName, content).then(
-                        () => {
-                            console.log('File ' + fileName + ' dumped')
-                        })
-                    );
-                })
-            );
+            promises.push(this.dumpPackage(packageName, destination));
 
             if (promises.length === 1024) {
                 await this.awaitAll(promises);
@@ -69,6 +58,34 @@ export default class Generator {
         }
 
         await this.awaitAll(promises);
+    }
+
+    private async dumpPackage(packageName: string, destination: string) {
+
+        const packageDestination = destination + '/';
+
+        const pkg = {
+            packages: {}
+        };
+
+        pkg.packages[packageName] = this.packages[packageName];
+        const content = JSON.stringify(pkg) + '\n';
+
+        const hash = await this.hash(content);
+
+        for (let i = 0; i < this.providerNames.length; i ++) {
+            await this.writeFile(packageDestination + this.providerNames[i].replace('%package%', packageName).replace('%hash%', hash.value), content);
+        }
+    }
+
+    private async writeFile(filename: string, content: string) {
+        await fs.promises.mkdir(path.dirname(filename), {
+            recursive: true
+        });
+
+        await fs.promises.writeFile(filename, content).then(() => {
+            console.log('File ' + filename + ' dumped')
+        })
     }
 
     private async fetchPackage(): Promise<packagesJson> {
@@ -137,9 +154,15 @@ export default class Generator {
         console.log('Memory usage: ' + prettyBytes(process.memoryUsage().rss));
     }
 
-    async awaitAll(promises: any[]) {
+    private async awaitAll(promises: any[]) {
         for(let i = 0; i < promises.length; i ++) {
             await promises[i];
         }
+    }
+
+    private async hash(content: string): Promise<{algo: string, value: string}> {
+        const algorithm = 'sha256';
+        let sha256sum = crypto.createHash(algorithm);
+        return {algo: algorithm, value: sha256sum.update(content).digest('hex')};
     }
 }
