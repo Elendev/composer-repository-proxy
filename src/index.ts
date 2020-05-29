@@ -2,6 +2,7 @@ import fetch from "node-fetch";
 import {HttpsProxyAgent} from "https-proxy-agent";
 import {packagesJson, providerJson} from "./composerApi";
 import Generator from "./Generator";
+import Dumper from "./Dumper";
 
 
 let httpAgent;
@@ -11,16 +12,11 @@ if (process.env.hasOwnProperty('https_proxy')) {
 }
 
 const generator = new Generator(new URL('https://packages.drupal.org/8'), httpAgent)
+const dumper = new Dumper();
 
 console.time('generate');
-console.time('init');
-generator.init().then(() => {
-  console.log('Init done');
-  console.timeEnd('init');
-  console.time('dump');
-  generator.dump(process.cwd() + '/output').then(() => {
-    console.log('Dump done');
-    console.timeEnd('dump');
+generator.getPackages().then(packages => {
+  dumper.dump(packages, process.cwd() + '/output').then(() => {
     console.timeEnd('generate');
   });
 });

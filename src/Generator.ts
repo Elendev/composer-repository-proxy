@@ -15,7 +15,7 @@ export default class Generator {
         '/p2/%package%.json',
     ];
 
-    private packageJson: packagesJson;
+    private packageJson: packagesJson = undefined;
 
     /**
      * All the packages available
@@ -23,6 +23,14 @@ export default class Generator {
     private packages = {};
 
     public constructor(private repository: URL, private httpAgent: HttpsProxyAgent = null) {
+    }
+
+    public async getPackages(): Promise<object> {
+        if (this.packageJson === undefined) {
+            await this.init();
+        }
+
+        return this.packages;
     }
 
     /**
@@ -42,50 +50,6 @@ export default class Generator {
         await this.awaitAll(promises);
 
         this.printMemoryUsage();
-    }
-
-    public async dump(destination: string) {
-
-        let promises = [];
-
-        for(let packageName in this.packages) {
-            promises.push(this.dumpPackage(packageName, destination));
-
-            if (promises.length === 1024) {
-                await this.awaitAll(promises);
-                promises = []
-            }
-        }
-
-        await this.awaitAll(promises);
-    }
-
-    private async dumpPackage(packageName: string, destination: string) {
-
-        const packageDestination = destination + '/';
-
-        const pkg = {
-            packages: {}
-        };
-
-        pkg.packages[packageName] = this.packages[packageName];
-        const content = JSON.stringify(pkg) + '\n';
-
-        const hash = await this.hash(content);
-
-        for (let i = 0; i < this.providerNames.length; i ++) {
-            await this.writeFile(packageDestination + this.providerNames[i].replace('%package%', packageName).replace('%hash%', hash.value), content);
-        }
-    }
-
-    private async writeFile(filename: string, content: string) {
-        await fs.promises.mkdir(path.dirname(filename), {
-            recursive: true
-        });
-
-        await fs.promises.writeFile(filename, content).then(() => {
-            console.log('File ' + filename + ' dumped')
-        })
     }
 
     private async fetchPackage(): Promise<packagesJson> {
