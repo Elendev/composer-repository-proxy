@@ -93,13 +93,13 @@ export default class Dumper {
             packages: [],
             "providers-url": this.providersUrl,
             "metadata-url": this.metadataUrl,
-            "providers-includes": {}
+            "provider-includes": {}
         };
 
         for (let i = 0; i < infos.length; i ++) {
             const currentInfo = infos[i];
-            providerFileObject["providers-includes"][currentInfo.pkg] = {}
-            providerFileObject["providers-includes"][currentInfo.pkg][currentInfo.algo] = currentInfo.hash
+            providerFileObject["provider-includes"][currentInfo.pkg] = {}
+            providerFileObject["provider-includes"][currentInfo.pkg][currentInfo.algo] = currentInfo.hash
         }
 
         const content = JSON.stringify(providerFileObject) + '\n';
