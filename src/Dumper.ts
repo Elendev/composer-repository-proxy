@@ -10,14 +10,14 @@ interface providerInfos {
 
 export default class Dumper {
 
-    private mainProviderName = '/p/all$%hash%.json';
-    private providersUrl = '/p/%package%$%hash%.json';
-    private metadataUrl = '/p2/%package%.json';
+    private mainProviderName = 'p/all$%hash%.json';
+    private providersUrl = 'p/%package%$%hash%.json';
+    private metadataUrl = 'p2/%package%.json';
 
     private providerNames = [
         this.providersUrl,
         this.metadataUrl,
-        '/p/%package%.json',
+        'p/%package%.json',
     ];
 
     public async dump(packages: object, destination: string) {
@@ -56,7 +56,7 @@ export default class Dumper {
         const hash = await this.hash(content);
 
         for (let i = 0; i < this.providerNames.length; i++) {
-            await this.writeFile(packageDestination + this.providerNames[i].replace('%package%', packageName).replace('%hash%', hash.value), content);
+            await this.writeFile(packageDestination + path.sep + this.providerNames[i].replace('%package%', packageName).replace('%hash%', hash.value), content);
         }
 
         return {
@@ -79,7 +79,7 @@ export default class Dumper {
         const content = JSON.stringify(providerFileObject) + '\n';
         const hash = await this.hash(content);
 
-        await this.writeFile(destination + this.mainProviderName.replace('%hash%', hash.value), content);
+        await this.writeFile(destination + path.sep + this.mainProviderName.replace('%hash%', hash.value), content);
 
         return {
             algo: hash.algo,
@@ -105,7 +105,7 @@ export default class Dumper {
         const content = JSON.stringify(providerFileObject) + '\n';
         const hash = await this.hash(content);
 
-        await this.writeFile(destination + '/packages.json', content);
+        await this.writeFile(destination + path.sep + 'packages.json', content);
     }
 
     private async writeFile(filename: string, content: string) {
