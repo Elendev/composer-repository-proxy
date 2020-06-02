@@ -10,14 +10,14 @@ interface providerInfos {
 
 export default class Dumper {
 
-    private mainProviderName = 'p/all$%hash%.json';
-    private providersUrl = 'p/%package%$%hash%.json';
-    private metadataUrl = 'p2/%package%.json';
+    private mainProviderName = '/p/all$%hash%.json';
+    private providersUrl = '/p/%package%$%hash%.json';
+    private metadataUrl = '/p2/%package%.json';
 
     private providerNames = [
         this.providersUrl,
         this.metadataUrl,
-        'p/%package%.json',
+        '/p/%package%.json',
     ];
 
     public async dump(packages: object, destination: string) {
